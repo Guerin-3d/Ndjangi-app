@@ -188,6 +188,10 @@ const TRANSLATIONS = {
     theme_dark: 'Mode sombre',
     theme_light: 'Mode clair',
     lang_switch_label: 'EN',
+
+    //___SESSION DELETE____
+    session_delete_btn: 'Supprimer la session',
+    session_delete_confirm: 'Supprimer cette session ? Toutes les cotisations et bénéficiaires liés seront supprimés.',
   },
 
   en: {
@@ -373,6 +377,10 @@ const TRANSLATIONS = {
     theme_dark: 'Dark mode',
     theme_light: 'Light mode',
     lang_switch_label: 'FR',
+
+    //___SESSION DELETE____
+    session_delete_btn: 'Delete session',
+    session_delete_confirm: 'Delete this session? All linked contributions and beneficiaries will be deleted.',
   }
 }
 

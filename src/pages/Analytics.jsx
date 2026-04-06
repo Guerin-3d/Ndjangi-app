@@ -149,9 +149,17 @@ export default function Analytics() {
   const shortfall = Math.max(0, totalExpected - totalCollected)
   const rate = totalExpected > 0 ? Math.round(totalCollected / totalExpected * 100) : 0
 
-  const fullMembers = members.filter(m => expectedPerMember > 0 && (memberTotals[m.id] || 0) >= expectedPerMember)
-  const partialMembers = members.filter(m => { const a = memberTotals[m.id] || 0; return a > 0 && (expectedPerMember === 0 || a < expectedPerMember) })
-  const noneMembers = members.filter(m => !memberTotals[m.id] || memberTotals[m.id] === 0)
+  const memberHasFull = new Set(
+    contributions.filter(c => c.amount >= 2000).map(c => c.member_id)
+  )
+  // Build a set of members who have paid something
+  const memberHasAny = new Set(
+    contributions.filter(c => c.amount > 0).map(c => c.member_id)
+  )
+  
+  const fullMembers = members.filter(m => memberHasFull.has(m.id))
+  const partialMembers = members.filter(m => memberHasAny.has(m.id) && !memberHasFull.has(m.id))
+  const noneMembers = members.filter(m => !memberHasAny.has(m.id))
   const beneficiaryIds = new Set(beneficiaries.map(b => b.member_id))
 
   // ── Drill-down views ─────────────────────────────────────────────

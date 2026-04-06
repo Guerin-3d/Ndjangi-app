@@ -12,6 +12,7 @@ export default function Session() {
   const { t, lang } = useLang()
   const locale = lang === 'fr' ? fr : enUS
 
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
@@ -56,6 +57,16 @@ export default function Session() {
     setTimeout(() => setSuccessMsg(''), 3500)
   }
 
+  async function deleteSession() {
+    if (!session) return
+    await supabase.from('beneficiaries').delete().eq('session_id', session.id)
+    await supabase.from('contributions').delete().eq('session_id', session.id)
+    await supabase.from('sessions').delete().eq('id', session.id)
+    setSession(null)
+    setConfirmDelete(false)
+    setForm({ name: '', start_date: '', end_date: '' })
+  }
+
   const totalDays = session
     ? Math.ceil((new Date(session.end_date) - new Date(session.start_date)) / 86400000)
     : 0
@@ -72,9 +83,14 @@ export default function Session() {
       <div className="page-header">
         <h1 className="page-title">{t('session_title')}</h1>
         {session && !editing && (
-          <button className="btn btn-dark btn-sm" onClick={() => setEditing(true)}>
-            {t('session_edit_btn')}
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button className="btn btn-dark btn-sm" onClick={() => setEditing(true)}>
+              {t('session_edit_btn')}
+            </button>
+            <button className="btn btn-danger btn-sm" onClick={() => setConfirmDelete(true)}>
+              {t('session_delete_btn')}
+            </button>
+          </div>
         )}
       </div>
 
@@ -193,6 +209,28 @@ export default function Session() {
             >
               {saving ? '...' : t('btn_save')}
             </button>
+          </div>
+        </div>
+      )}
+
+      {confirmDelete && (
+        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setConfirmDelete(false)}>
+          <div className="modal">
+            <div className="modal-handle" />
+            <h2 className="modal-title" style={{ color: 'var(--red)' }}>
+              {t('session_delete_btn')}
+            </h2>
+            <p style={{ fontSize: '14px', color: 'var(--text-muted)', lineHeight: 1.7 }}>
+              {t('session_delete_confirm')}
+            </p>
+            <div className="modal-actions">
+              <button className="btn btn-ghost" onClick={() => setConfirmDelete(false)}>
+                {t('btn_cancel')}
+              </button>
+              <button className="btn btn-danger" onClick={deleteSession}>
+                {t('btn_delete')}
+              </button>
+            </div>
           </div>
         </div>
       )}
